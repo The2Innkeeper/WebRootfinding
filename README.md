@@ -1,2 +1,2 @@
 # WebRootfinding
-Root-finding within the browser using javascript libraries
+Polynomial real root-finding within the browser using javascript
