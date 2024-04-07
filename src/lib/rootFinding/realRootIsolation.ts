@@ -21,6 +21,12 @@ export function isolatePositiveRealRootsBisection(polynomial: Polynomial, maxIte
   if (polynomial.some(coeff => isNaN(coeff))) {
     throw new Error("The polynomial coefficients cannot contain NaN.");
   }
+  if (!hasStrictlyPositiveRoots(polynomial)) {
+    if (polynomial[0] === 0) {
+      return [[0,0]];
+    }
+    return [];
+  }
 
   // Process polynomial
   const squareFreePolynomial = makeSquareFree(polynomial);
@@ -98,7 +104,10 @@ export function isolatePositiveRealRootsContinuedFractions(polynomial: Polynomia
   if (polynomial.length === 0) {
     throw new Error("The polynomial cannot be empty.");
   }
-  if (!hasPositiveRoots(polynomial)) {
+  if (!hasStrictlyPositiveRoots(polynomial)) {
+    if (polynomial[0] === 0) {
+      return [[0,0]];
+    }
     return [];
   }
 
@@ -183,8 +192,8 @@ export function isolatePositiveRealRootsContinuedFractions(polynomial: Polynomia
 
 // Helper functions
 
-function hasPositiveRoots(polynomial: Polynomial): boolean {
-  return polynomial.some(coeff => coeff <= 0);
+function hasStrictlyPositiveRoots(polynomial: Polynomial): boolean {
+  return polynomial.some(coeff => coeff < 0);
 }
 
 function handleZeroFunction(isolatedRootIntervals: Interval[], polynomial: Polynomial): boolean {

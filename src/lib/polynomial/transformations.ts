@@ -34,13 +34,11 @@ export function mapIntervalToPositiveReals(polynomial: Polynomial, interval: Int
 export function mapUnitIntervalToPositiveReals(polynomial: Polynomial): Polynomial {
   const transformedCoefficients = [...polynomial];
 
-  // Step 1: Apply x := 1/x
+  // Step 1: Apply P(x) := x^n * P(1/x)
   transformedCoefficients.reverse();
 
   // Step 2: Apply x := x + 1
-  taylorShiftBy1(transformedCoefficients);
-
-  return transformedCoefficients;
+  return taylorShiftBy1(transformedCoefficients);
 }
 
 /**
@@ -59,9 +57,7 @@ export function transformedForLowerInterval(polynomial: Polynomial, scale: numbe
   transformedCoefficients.reverse();
 
   // Step 3: Apply x := x+1
-  taylorShift(transformedCoefficients, 1);
-
-  return transformedCoefficients;
+  return taylorShiftBy1(transformedCoefficients);
 }
 
 /**

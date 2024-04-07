@@ -20,7 +20,36 @@ export function createPolynomial(coefficients: number[]): Polynomial {
     }
   }
 
-  return coefficients;
+  return trimLeadingZeroes(coefficients);
+}
+
+/**
+ * Removes leading zeros (trailing zeroes in the array) from a polynomial.
+ * @param polynomial The polynomial to trim.
+ * @returns The trimmed polynomial.
+ */
+export function trimLeadingZeroes(polynomial: Polynomial): Polynomial {
+  let lastIndex = polynomial.length - 1;
+
+  // If the polynomial is empty, return a polynomial that represents 0.
+  if (polynomial.length === 0) {
+    return [0];
+  }
+
+  // While there are more than one coefficient and the last one is zero, decrement lastIndex
+  while (lastIndex > 0 && Math.abs(polynomial[lastIndex]) < Number.EPSILON) {
+    lastIndex--;
+  }
+  // If all coefficients were zero, return a polynomial that represents 0.
+  if (lastIndex === 0 && Math.abs(polynomial[0]) < Number.EPSILON) {
+    return [0];
+  }
+  // Return the polynomial up to the last non-zero coefficient
+  return polynomial.slice(0, lastIndex + 1);
+}
+
+export function hasStrictlyPositiveRoots(polynomial: Polynomial): boolean {
+  return polynomial.some(coeff => coeff < 0);
 }
 
 /**

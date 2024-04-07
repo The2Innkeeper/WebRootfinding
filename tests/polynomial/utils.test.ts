@@ -1,5 +1,5 @@
 import { Polynomial } from '../../src/lib/polynomial/types';
-import { createPolynomial, polynomialToString } from '../../src/lib/polynomial/utils';
+import { createPolynomial, polynomialToString, trimLeadingZeroes } from '../../src/lib/polynomial/utils';
 import { addPolynomials } from '../../src/lib/polynomial/operations';
 
 describe('Polynomial', () => {
@@ -29,5 +29,43 @@ describe('Polynomial', () => {
 
     const poly4: Polynomial = [-1.0, -2.5, -3.25, -4]; // - 1 - 2.5x^1 - 3.25x^2 - 4x^3
     expect(polynomialToString(poly4)).toBe('- 1 - 2.5x^1 - 3.25x^2 - 4x^3');
+  });
+
+  describe('trimLeadingZeroes', () => {
+    it('removes leading zeroes from a polynomial', () => {
+      const input = [1, 2, 3, 0, 0];
+      const expected = [1, 2, 3];
+      expect(trimLeadingZeroes(input)).toEqual(expected);
+    });
+
+    it('returns an array with a single zero when all coefficients are zero', () => {
+      const input = [0, 0, 0, 0];
+      const expected = [0];
+      expect(trimLeadingZeroes(input)).toEqual(expected);
+    });
+
+    it('does nothing to a polynomial without leading zeroes', () => {
+      const input = [0, 0, 1, 2, 3];
+      const expected = [0, 0, 1, 2, 3]; // No trimming needed here; example shows "mathematical" leading zeros being preserved deliberately
+      expect(trimLeadingZeroes(input)).toEqual(expected);
+    });
+
+    it('returns the original polynomial if it contains only one non-zero coefficient', () => {
+      const input = [5];
+      const expected = [5];
+      expect(trimLeadingZeroes(input)).toEqual(expected);
+    });
+
+    it('handles an empty array correctly by returning a single zero', () => {
+      const input: number[] = [];
+      const expected = [0];
+      expect(trimLeadingZeroes(input)).toEqual(expected);
+    });
+
+    it('removes leading (mathematically) zeroes while preserving trailing zeroes', () => {
+      const input = [0, 0, 1, 0];
+      const expected = [0, 0, 1];
+      expect(trimLeadingZeroes(input)).toEqual(expected);
+    });
   });
 });
