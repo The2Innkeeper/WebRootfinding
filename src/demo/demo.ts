@@ -1,4 +1,5 @@
-import { Polynomial, findRealRoots } from '../lib';
+import { Polynomial } from '../lib';
+import { findAllRealRoots } from '../lib/rootFinding/rootFinding';
 
 const coefficientsInput = document.getElementById('coefficients') as HTMLInputElement;
 const findRootsButton = document.getElementById('findRoots') as HTMLButtonElement;
@@ -13,7 +14,7 @@ function runDemo() {
   const polynomial: Polynomial = coefficientsString.split(',').map(Number);
   console.log('Polynomial:', polynomial);
 
-  const roots = findRealRoots(polynomial);
+  const roots = findAllRealRoots(polynomial);
   console.log('Roots:', roots);
 
   resultDiv.textContent = `Real roots: ${roots.join(', ')}`;

@@ -1,15 +1,8 @@
-import { Polynomial } from '../src/lib/types';
-import { evaluatePolynomial, addPolynomials, polynomialToString } from '../src/lib/polynomial';
+import { Polynomial } from '../../src/lib/polynomial/types';
+import { createPolynomial, polynomialToString } from '../../src/lib/polynomial/utils';
+import { addPolynomials } from '../../src/lib/polynomial/operations';
 
 describe('Polynomial', () => {
-  it('should evaluate a polynomial correctly', () => {
-    const poly: Polynomial = [1, 2, 3]; // 1 + 2x + 3x^2
-    expect(evaluatePolynomial(poly, 0)).toBe(1);
-    expect(evaluatePolynomial(poly, 1)).toBe(6);
-    expect(evaluatePolynomial(poly, 2)).toBe(17);
-    expect(evaluatePolynomial(poly, -1)).toBe(2);
-  });
-
   it('should add two polynomials correctly', () => {
     const poly1: Polynomial = [1, 2, 3]; // 1 + 2x + 3x^2
     const poly2: Polynomial = [4, 5]; // 4 + 5x
