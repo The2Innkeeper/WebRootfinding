@@ -124,7 +124,7 @@ export function isolatePositiveRealRootsContinuedFractions(inputPolynomial: Poly
       throw new Error("Something went wrong: found too many positive roots (more than number of sign variations).");
     }
 
-    const [currentPolynomial, currentMobius, variationCount0ToInf] = tasks.shift()!;
+    const [currentPolynomial, currentMobius, variationCount0ToInf] = [...tasks.shift()!];
 
     // Handle edge cases
     if (currentPolynomial.length === 0) {

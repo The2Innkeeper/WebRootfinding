@@ -37,7 +37,7 @@ describe('Polynomial Operations', () => {
     });
   });
 
-    describe('polynomialDerivative', () => {
+  describe('polynomialDerivative', () => {
     test('calculates the derivative of a polynomial correctly', () => {
       expect(polynomialDerivative([3, 2, 1])).toEqual([2, 2]);
     });
@@ -45,6 +45,12 @@ describe('Polynomial Operations', () => {
     test('returns [0] for constant or empty polynomial', () => {
       expect(polynomialDerivative([3])).toEqual([0]);
       expect(polynomialDerivative([])).toEqual([0]);
+    });
+
+  test('derivative is correct', () => {
+    // (x+1)x(x-1)^2(x-5.5) = 0 - 5.5 x + 6.5 x^2 + 4.5 x^3 - 6.5 x^4 + x^5
+    // d/dx (0 - 5.5 x + 6.5 x^2 + 4.5 x^3 - 6.5 x^4 + x^5) = -5.5 + 13x + 13.5x^2 - 26 x^3 + 5x^4
+      expect(polynomialDerivative([0, -5.5, 6.5, 4.5, -6.5, 1])).toEqual([-5.5, 13, 13.5, -26, 5]);
     });
   });
 
@@ -63,6 +69,18 @@ describe('Polynomial Operations', () => {
 
     test('makeSquareFree makes a polynomial square-free', () => {
       expect(makeSquareFree([-1, 3, -3, 1])).toEqual([-1, 1]); // (x-1)^3
+    });
+
+    test('makeSquareFree removes repeated roots into single roots', () => {
+      // (x+1)x(x-1)^2(x-5.5) = 0 - 5.5 x + 6.5 x^2 + 4.5 x^3 - 6.5 x^4 + x^5
+      // (x+1)x(x-1)(x-5.5) = 0 + 5.5x - x^2 - 5.5x^3 + x^4
+      const polynomial = [0, -5.5, 6.5, 4.5, -6.5, 1];
+      const squareFreePolynomial = [0, 5.5, -1, -5.5, 1];
+      const result = makeSquareFree(polynomial);
+      expect(squareFreePolynomial.length).toEqual(result.length);
+      squareFreePolynomial.forEach((coefficient, index) => {
+        expect(coefficient).toBeCloseTo(result[index], 6);
+      })
     });
   });
 
@@ -83,11 +101,27 @@ describe('Polynomial Operations', () => {
       expect(() => polynomialDivision([1, -3, 0, 2], [0])).toThrow("Attempted to divide by a zero polynomial.");
     });
     });
+  });
 
+  describe('polynomialGCD', () => {
     test('polynomialGCD finds the greatest common divisor of two polynomials', () => {
       const a = [2, 3, 1]; // 2 + 3x + x^2 = (x + 1)(x + 2)
       const b = [2, 1];   // 2 + x
       expect(polynomialGCD(a, b)).toEqual([2, 1]);
+    });
+
+    test('polynomialGCD finds the GCD between a polynomial and its derivative', () => {
+      // (x+1)x(x-1)^2(x-5.5) = 0 - 5.5 x + 6.5 x^2 + 4.5 x^3 - 6.5 x^4 + x^5
+      // d/dx (0 - 5.5 x + 6.5 x^2 + 4.5 x^3 - 6.5 x^4 + x^5) = -5.5 + 13x + 13.5x^2 - 26 x^3 + 5x^4
+      // GCD = -1 + x
+      const a = [0, -5.5, 6.5, 4.5, -6.5, 1];
+      const b = [-5.5, 13, 13.5, -26, 5];
+      const expectedGCD = [-1, 1];
+      const result = polynomialGCD(a, b);
+      expect(result).toHaveLength(expectedGCD.length);
+      result.forEach((coefficient, index) => {
+        expect(coefficient).toBeCloseTo(expectedGCD[index], 6);
+      })
     });
 
     test('polynomialGCD handles coprime polynomials', () => {

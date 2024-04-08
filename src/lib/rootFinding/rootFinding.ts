@@ -22,6 +22,12 @@ export function findAllRealRoots(polynomial: Polynomial, precision: number = 1e-
 
   const squareFreePolynomial = makeSquareFree(polynomial);
   
+  // Deal with 0 first because it's annoying
+  if (Math.abs(polynomial[0]) < Number.EPSILON) {
+    roots.push(0);
+    polynomial.splice(0, 1);
+  }
+
   // Find negative roots
   if (hasStrictlyNegativeRoots(squareFreePolynomial)) {
     const negatedPolynomial = scaleInput(squareFreePolynomial, -1);
@@ -32,13 +38,8 @@ export function findAllRealRoots(polynomial: Polynomial, precision: number = 1e-
     for (const interval of negativeRootIntervals) {
       const negatedRoot = refineRootIntervalBisection(evaluateFunc, interval, precision);
       const root = -negatedRoot;
-      insertRootSorted(roots, root);
+      insertRootSorted(roots, root, precision);
     }
-  }
-
-  // Check for root at zero: remove duplicate -0 and 0
-  if (squareFreePolynomial[0] === -0) {
-    roots.splice(roots.length - 1, 1);
   }
 
   // Find positive roots
@@ -48,16 +49,20 @@ export function findAllRealRoots(polynomial: Polynomial, precision: number = 1e-
 
     for (const interval of positiveRootIntervals) {
       const root = refineRootIntervalBisection(evaluateFunc, interval, precision);
-      insertRootSorted(roots, root);
+      insertRootSorted(roots, root, precision);
     }
   }
 
   return roots;
 }
 
-function insertRootSorted(roots: number[], newRoot: number): void {
+function insertRootSorted(roots: number[], newRoot: number, tolerance: number = 1e-6): void {
   let insertIndex = roots.length;
   for (let i = 0; i < roots.length; i++) {
+    // Check if newRoot is considered equal to an existing root within the tolerance.
+    if (Math.abs(newRoot - roots[i]) <= tolerance) {
+      return; // Do not insert duplicates.
+    }
     if (newRoot < roots[i]) {
       insertIndex = i;
       break;
