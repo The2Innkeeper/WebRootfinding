@@ -17,6 +17,6 @@ function runDemo() {
   const roots = findAllRealRoots(polynomial);
   console.log('Roots:', roots);
 
-  resultDiv.textContent = `Real roots: ${roots.join(', ')}`;
+  resultDiv.textContent = `Real roots: ${roots.length > 0 ? roots.join(', ') : 'none'}`;
   console.log('Result displayed');
 }
