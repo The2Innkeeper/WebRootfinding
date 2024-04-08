@@ -8,6 +8,7 @@
   },
   "scripts": {
     "test": "jest",
+    "test:debug": "jest --runInBand",
     "build": "webpack"
   },
   "jest": {
