@@ -52,6 +52,10 @@ export function hasStrictlyPositiveRoots(polynomial: Polynomial): boolean {
   return polynomial.some(coeff => coeff < 0);
 }
 
+export function hasStrictlyNegativeRoots(polynomial: Polynomial): boolean {
+  return polynomial.some(coeff => coeff > 0);
+}
+
 /**
  * Updates the coefficient at a specified index within the polynomial.
  * @param polynomial The polynomial to update.

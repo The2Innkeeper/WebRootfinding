@@ -35,12 +35,26 @@ describe('Root Isolation Tests', () => {
     const intervals = isolatePositiveRealRootsContinuedFractions(poly);
     assertIntervalsContainRoots(intervals, [1]);
   });
-
+  
   test('TestMultipleRoots', () => {
     // Polynomial with multiple distinct roots, e.g., x^3 - 6x^2 + 11x - 6 = (x-1)(x-2)(x-3)
     const poly: Polynomial = [-6, 11, -6, 1];
     const intervals = isolatePositiveRealRootsContinuedFractions(poly);
     assertIntervalsContainRoots(intervals, [1, 2, 3]);
+  });
+
+  test('TestTwoNonintegerRoots', () => {
+    // Polynomial with multiple distinct non-integer roots, e.g., (x-1.5)(x-2.5) = 3.75 + -4x + x^2
+    const poly: Polynomial = [3.75, -4, 1];
+    const intervals = isolatePositiveRealRootsContinuedFractions(poly);
+    assertIntervalsContainRoots(intervals, [1.5, 2.5]);
+  });
+
+  test('ThreeRootsInIntervalOfLengthOne', () => {
+    // Polynomial with three roots in an interval of length 1, e.g., (x-1)(x-1.5)(x-2) = -3 +6.5x -4.5x^2 +1x^3
+    const poly: Polynomial = [-3, 6.5, -4.5, 1];
+    const intervals = isolatePositiveRealRootsContinuedFractions(poly);
+    assertIntervalsContainRoots(intervals, [1, 1.5, 2]);
   });
 
   test('TestRootAtZero', () => {
