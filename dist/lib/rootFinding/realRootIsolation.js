@@ -53,7 +53,7 @@ function isolatePositiveRealRootsBisection(polynomial, maxIterations = 50) {
                 const originalMidpoint = (0, operations_2.evaluateAt)(currentMobius, 0.5);
                 let foundRootAtMidpoint = 0;
                 if ((0, evaluation_1.evaluatePolynomial)(horizontallyShrunkenPolynomial, originalMidpoint) === 0) {
-                    addIntervalWithoutDuplicates(isolatingIntervals, [originalMidpoint, originalMidpoint]);
+                    addIntervalSort(isolatingIntervals, [originalMidpoint, originalMidpoint]);
                     foundRootAtMidpoint = 1;
                 }
                 // Left half
@@ -91,29 +91,31 @@ exports.isolatePositiveRealRootsBisection = isolatePositiveRealRootsBisection;
  * @param maxIterations The maximum number of iterations to perform (default: 50).
  * @returns A list of intervals, each containing a single positive real root.
  */
-function isolatePositiveRealRootsContinuedFractions(polynomial, maxIterations = 50) {
+function isolatePositiveRealRootsContinuedFractions(inputPolynomial, maxIterations = 50) {
     // Validate input
-    if (polynomial.length === 0) {
-        throw new Error("The polynomial cannot be empty.");
+    if (inputPolynomial.length === 0) {
+        throw new Error("The input polynomial cannot be empty.");
     }
-    if (!hasStrictlyPositiveRoots(polynomial)) {
-        if (polynomial[0] === 0) {
-            return [[0, 0]];
-        }
+    if (!hasStrictlyPositiveRoots(inputPolynomial)) {
         return [];
     }
+    // Ensure immutability
+    const polynomial = [...inputPolynomial];
     const squareFreePolynomial = (0, operations_1.makeSquareFree)(polynomial);
     const initialSignVariationCount = countSignVariations(squareFreePolynomial);
-    const tasks = [[squareFreePolynomial, (0, operations_2.createMobiusTransformation)(1, 0, 0, 1), initialSignVariationCount]];
+    const tasks = [[squareFreePolynomial.slice(), (0, operations_2.createMobiusTransformation)(1, 0, 0, 1), initialSignVariationCount]];
     const isolatedRootIntervals = [];
     for (let iteration = 0; iteration < maxIterations && tasks.length > 0; iteration++) {
         if (iteration === maxIterations) {
             return isolatedRootIntervals.length === 0 ? [] : isolatedRootIntervals;
         }
-        const [currentPolynomial, currentMobius, variationCount0ToInf] = tasks.shift();
+        if (isolatedRootIntervals.length > initialSignVariationCount) {
+            throw new Error("Something went wrong: found too many positive roots (more than number of sign variations).");
+        }
+        const [currentPolynomial, currentMobius, variationCount0ToInf] = [...tasks.shift()];
         // Handle edge cases
         if (currentPolynomial.length === 0) {
-            throw new Error("The polynomial cannot be empty.");
+            throw new Error("The current polynomial cannot be empty.");
         }
         if (handleZeroFunction(isolatedRootIntervals, currentPolynomial)) {
             break;
@@ -131,7 +133,7 @@ function isolatePositiveRealRootsContinuedFractions(polynomial, maxIterations = 
         }
         if (variationCount0ToInf === 1) {
             // 1 root, add to isolated and exit
-            addMobiusIntervalAdjusted(isolatedRootIntervals, currentMobius, polynomial);
+            addMobiusIntervalAdjusted(isolatedRootIntervals, currentMobius, squareFreePolynomial);
             continue;
         }
         // If var(P) > 1, then proceed to splitting into ]0,1[, [1,1], and ]1,+inf[
@@ -145,7 +147,7 @@ function isolatePositiveRealRootsContinuedFractions(polynomial, maxIterations = 
         foundRootAt1 += checkAndHandleRootAtZero(isolatedRootIntervals, polynomial1ToInf, mobius1ToInf) ? 1 : 0;
         const variationCount1ToInf = countSignVariations(polynomial1ToInf);
         if (variationCount1ToInf === 1) {
-            addMobiusIntervalAdjusted(isolatedRootIntervals, mobius1ToInf, polynomial);
+            addMobiusIntervalAdjusted(isolatedRootIntervals, mobius1ToInf, squareFreePolynomial);
         }
         else if (variationCount1ToInf > 1) {
             tasks.push([polynomial1ToInf, mobius1ToInf, variationCount1ToInf]);
@@ -158,10 +160,10 @@ function isolatePositiveRealRootsContinuedFractions(polynomial, maxIterations = 
         const polynomial0To1 = (0, transformations_1.transformedForLowerInterval)(currentPolynomial, 1);
         const mobius0To1 = (0, operations_2.transformedForLowerInterval)(currentMobius, 1);
         if (variationCount0To1 === 1) {
-            addMobiusIntervalAdjusted(isolatedRootIntervals, mobius0To1, polynomial);
+            addMobiusIntervalAdjusted(isolatedRootIntervals, mobius0To1, squareFreePolynomial);
             continue;
         }
-        if (polynomial0To1[0] < Number.EPSILON) {
+        if (Math.abs(polynomial0To1[0]) < Number.EPSILON) {
             polynomial0To1.shift();
         }
         tasks.push([polynomial0To1, mobius0To1, variationCount0To1]);
@@ -175,7 +177,7 @@ function hasStrictlyPositiveRoots(polynomial) {
 }
 function handleZeroFunction(isolatedRootIntervals, polynomial) {
     if (polynomial.length === 1 && polynomial[0] === 0) {
-        addIntervalWithoutDuplicates(isolatedRootIntervals, [0, Infinity]);
+        addIntervalSort(isolatedRootIntervals, [0, Infinity]);
         return true;
     }
     return false;
@@ -193,7 +195,7 @@ function checkAndHandleRootAtZero(intervals, polynomial, mobius) {
         return false;
     }
     const root = (0, operations_2.evaluateAt)(mobius, 0);
-    addIntervalWithoutDuplicates(intervals, [root, root]);
+    addIntervalSort(intervals, [root, root]);
     polynomial.shift();
     return true;
 }
@@ -201,35 +203,48 @@ function addMobiusIntervalAdjusted(isolatedRootIntervals, mobius, initialPolynom
     const mobiusImage = (0, operations_2.positiveDomainImage)(mobius);
     if (mobiusImage[1] === Infinity) {
         const updatedRightBound = (0, rootBounds_1.lmqPositiveUpperBound)(initialPolynomial);
-        addIntervalWithoutDuplicates(isolatedRootIntervals, [mobiusImage[0], updatedRightBound]);
+        addIntervalSort(isolatedRootIntervals, [mobiusImage[0], updatedRightBound]);
         return;
     }
-    addIntervalWithoutDuplicates(isolatedRootIntervals, mobiusImage);
+    addIntervalSort(isolatedRootIntervals, mobiusImage);
 }
 function addIsolatingInterval(isolatedRootIntervals, mobius, initialPolynomial) {
     const mobiusImage = (0, operations_2.positiveDomainImage)(mobius);
     if (mobiusImage[1] === Infinity) {
         const updatedRightBound = (0, rootBounds_1.lmqPositiveUpperBound)(initialPolynomial);
-        addIntervalWithoutDuplicates(isolatedRootIntervals, [mobiusImage[0], updatedRightBound]);
+        addIntervalSort(isolatedRootIntervals, [mobiusImage[0], updatedRightBound]);
         return;
     }
-    addIntervalWithoutDuplicates(isolatedRootIntervals, mobiusImage);
+    addIntervalSort(isolatedRootIntervals, mobiusImage);
 }
-function addIntervalWithoutDuplicates(intervals, newInterval) {
+function addIntervalSort(intervals, newInterval) {
     for (let i = 0; i < intervals.length; i++) {
         const existingInterval = intervals[i];
         const isDuplicate = existingInterval[0] === newInterval[0] && existingInterval[1] === newInterval[1];
         if (isDuplicate) {
             return;
         }
-        const isExistingSubintervalOfNew = existingInterval[0] > newInterval[0] && existingInterval[1] <= newInterval[1];
-        const isNewSubintervalOfExisting = newInterval[0] > existingInterval[0] && newInterval[1] <= existingInterval[1];
+        const isExistingSubintervalOfNew = existingInterval[0] > newInterval[0] && existingInterval[1] < newInterval[1];
+        const isNewSubintervalOfExisting = newInterval[0] > existingInterval[0] && newInterval[1] < existingInterval[1];
         if (isExistingSubintervalOfNew) {
             return;
         }
         else if (isNewSubintervalOfExisting) {
             intervals.splice(i, 1);
             i--;
+        }
+    }
+    const [newLeft, newRight] = newInterval;
+    for (let i = 0; i < intervals.length; i++) {
+        const [existingLeft, existingRight] = intervals[i];
+        if (newRight <= existingLeft) {
+            // New interval is completely to the left of the existing interval
+            intervals.splice(i, 0, newInterval);
+            return;
+        }
+        else if (newLeft >= existingRight) {
+            // New interval is completely to the right of the existing interval
+            continue;
         }
     }
     intervals.push(newInterval);

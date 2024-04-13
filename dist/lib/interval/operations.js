@@ -25,7 +25,7 @@ function getRightBound(interval) {
 }
 exports.getRightBound = getRightBound;
 function getLength(interval) {
-    return interval[1] - interval[0];
+    return Math.abs(interval[1] - interval[0]);
 }
 exports.getLength = getLength;
 function containsValue(interval, value) {
@@ -36,15 +36,15 @@ function containsValue(interval, value) {
 }
 exports.containsValue = containsValue;
 /**
- * Checks if the interval contains exactly one root of the given continuous function.
+ * Checks if the interval contains an odd number of roots of the given continuous function.
  * @param func The function to check for roots.
- * @returns True if the interval contains exactly one root, otherwise false.
+ * @returns True if the interval contains an odd number of roots, otherwise false.
  */
 function containsSingleRoot(interval, func) {
     // Checking sign change as a necessary condition for a root in the interval
     const valueAtLeft = func(interval[0]);
     const valueAtRight = func(interval[1]);
-    // If the signs are different, there is at least one root in the interval
+    // If the signs are different, there is at least one root in the interval, odd number of roots
     return Math.sign(valueAtLeft) !== Math.sign(valueAtRight);
 }
 exports.containsSingleRoot = containsSingleRoot;

@@ -2,23 +2,25 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.refineRootIntervalBisectionBounds = exports.refineRootIntervalBisection = void 0;
 /**
- * Finds a root of the function within the specified interval using the bisection method.
+ * Finds a root of the function within the specified Interval using the bisection method.
  * @param func The function whose roots we are trying to refine.
- * @param interval The interval to search for a root.
+ * @param interval The OPEN interval to search for a root.
  * @param tolerance The tolerance for convergence. The method aims to find a root such that the size of the final interval is less than or equal to this value. Default is 1e-5.
  * @param maxIterations The maximum number of iterations to perform. This prevents the method from running indefinitely. Default is 100.
- * @returns The approximate position of the root within the specified interval, determined to be within the specified tolerance, or NaN if the root cannot be found within the given number of iterations.
+ * @returns Returns bound if length 0, otherwise the approximate position of the root
+ * within the specified interval, determined to be within the specified tolerance,
+ * or NaN if the root cannot be found within the given number of iterations.
  * @throws {Error} Thrown if the initial interval does not contain a root.
  */
-function refineRootIntervalBisection(func, interval, tolerance = 1e-5, maxIterations = 100) {
+function refineRootIntervalBisection(func, interval, tolerance = 1e-5, maxIterations = 250) {
     return refineRootIntervalBisectionBounds(func, interval[0], interval[1], tolerance, maxIterations);
 }
 exports.refineRootIntervalBisection = refineRootIntervalBisection;
 /**
- * Finds a root of the function within the specified interval using the bisection method.
+ * Finds a root of the function within the specified OPEN interval using the bisection method.
  * @param func The function whose roots we are trying to refine.
- * @param leftBound The left boundary of the interval to search for a root.
- * @param rightBound The right boundary of the interval to search for a root.
+ * @param leftBound The EXCLUDED left boundary of the interval to search for a root.
+ * @param rightBound The EXCLUDED right boundary of the interval to search for a root.
  * @param tolerance The tolerance for convergence. The method aims to find a root such that the size of the final interval is less than or equal to this value. Default is 1e-5.
  * @param maxIterations The maximum number of iterations to perform. This prevents the method from running indefinitely. Default is 100.
  * @returns The approximate position of the root within the specified interval, determined to be within the specified tolerance, or NaN if the root cannot be found within the given number of iterations.
@@ -26,16 +28,26 @@ exports.refineRootIntervalBisection = refineRootIntervalBisection;
  */
 function refineRootIntervalBisectionBounds(func, leftBound, rightBound, tolerance = 1e-5, maxIterations = 100) {
     let fLeft = func(leftBound);
+    // Initial interval is root
+    if (leftBound === rightBound) {
+        if (fLeft === 0)
+            return leftBound;
+        else
+            throw new Error("The initial interval does not contain a single root.");
+    }
     let fRight = func(rightBound);
+    // Case open interval: shrink bounds a bit to ensure that the interval contains a single root
     if (fLeft === 0) {
         leftBound += tolerance;
         fLeft = func(leftBound);
     }
-    if (fRight === 0)
-        return rightBound;
+    if (fRight === 0) {
+        rightBound -= tolerance;
+        fRight = func(rightBound);
+    }
     // Check if the initial interval is valid
     if (Math.sign(fLeft) === Math.sign(fRight)) {
-        throw new Error("The initial interval does not contain a single root.");
+        throw new Error(`The initial interval ${leftBound} to ${rightBound} does not contain a single root.`);
     }
     for (let iteration = 0; iteration < maxIterations; iteration++) {
         const midpoint = (leftBound + rightBound) / 2;

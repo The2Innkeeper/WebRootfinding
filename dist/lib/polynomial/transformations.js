@@ -28,11 +28,10 @@ exports.mapIntervalToPositiveReals = mapIntervalToPositiveReals;
  */
 function mapUnitIntervalToPositiveReals(polynomial) {
     const transformedCoefficients = [...polynomial];
-    // Step 1: Apply x := 1/x
+    // Step 1: Apply P(x) := x^n * P(1/x)
     transformedCoefficients.reverse();
     // Step 2: Apply x := x + 1
-    taylorShiftBy1(transformedCoefficients);
-    return transformedCoefficients;
+    return taylorShiftBy1(transformedCoefficients);
 }
 exports.mapUnitIntervalToPositiveReals = mapUnitIntervalToPositiveReals;
 /**
@@ -48,8 +47,7 @@ function transformedForLowerInterval(polynomial, scale) {
     // Step 2: Apply P(x) := x^degree(P)*P(1/x)
     transformedCoefficients.reverse();
     // Step 3: Apply x := x+1
-    taylorShift(transformedCoefficients, 1);
-    return transformedCoefficients;
+    return taylorShiftBy1(transformedCoefficients);
 }
 exports.transformedForLowerInterval = transformedForLowerInterval;
 /**
