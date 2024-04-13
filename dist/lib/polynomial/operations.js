@@ -25,7 +25,7 @@ exports.addPolynomials = addPolynomials;
  * @returns A normalized version of the polynomial (leading coefficient is 1).
  */
 function normalizePolynomial(polynomial) {
-    if (polynomial.length === 0 || polynomial[polynomial.length - 1] === 0) {
+    if (polynomial.length === 0 || Math.abs(polynomial[polynomial.length - 1]) < Number.EPSILON) {
         return [0];
     }
     const scalingFactor = polynomial[polynomial.length - 1];
@@ -133,12 +133,12 @@ exports.polynomialDivision = polynomialDivision;
  * Calculates the greatest common divisor (GCD) of two polynomials.
  * @param a The first polynomial.
  * @param b The second polynomial.
+ * @param tolerance The tolerance for the remainder of the polynomial division. Default is 1e-7.
  * @returns The GCD of the two polynomials.
  * @remarks Implements the Euclidean algorithm tailored for polynomials.
  */
-function polynomialGCD(a, b) {
-    // Continuously apply the Euclidean algorithm until a remainder of zero is found.
-    while (b.some(c => Math.abs(c) > Number.EPSILON)) {
+function polynomialGCD(a, b, tolerance = 1e-7) {
+    while (b.length > 1 || Math.abs(b[0]) > tolerance) {
         const [, remainder] = polynomialDivision(a, b);
         a = b;
         b = remainder;

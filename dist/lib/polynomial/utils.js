@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.polynomialToString = exports.updatePolynomialCoefficient = exports.hasStrictlyPositiveRoots = exports.trimLeadingZeroes = exports.createPolynomial = void 0;
+exports.polynomialToString = exports.updatePolynomialCoefficient = exports.hasStrictlyNegativeRoots = exports.hasStrictlyPositiveRoots = exports.trimLeadingZeroes = exports.createPolynomial = void 0;
 /**
  * Creates a new polynomial from the given coefficients.
  * @param coefficients The coefficients of the polynomial in increasing order of degree.
@@ -47,6 +47,10 @@ function hasStrictlyPositiveRoots(polynomial) {
     return polynomial.some(coeff => coeff < 0);
 }
 exports.hasStrictlyPositiveRoots = hasStrictlyPositiveRoots;
+function hasStrictlyNegativeRoots(polynomial) {
+    return polynomial.some(coeff => coeff > 0);
+}
+exports.hasStrictlyNegativeRoots = hasStrictlyNegativeRoots;
 /**
  * Updates the coefficient at a specified index within the polynomial.
  * @param polynomial The polynomial to update.
