@@ -53,7 +53,11 @@ export function findAllRealRoots(polynomial: Polynomial, precision: number = 1e-
     }
   }
 
-  return roots;
+  // Determine the number of significant digits based on the precision
+  const significantDigits = Math.round(-Math.log10(precision));
+
+  // Round the roots to the determined number of significant digits before returning
+  return roots.map(root => Number(root.toPrecision(significantDigits)));
 }
 
 function insertRootSorted(roots: number[], newRoot: number, tolerance: number = 1e-6): void {
