@@ -1,5 +1,5 @@
 {
-  "name": "polynomial-real-root-finding",
+  "name": "@the2innkeeper/polynomial-real-root-finding",
   "version": "1.0.0",
   "description": "Polynomial real root-finding within the browser using javascript libraries",
   "main": "./dist/index.js",
