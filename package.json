@@ -1,21 +1,32 @@
 {
-  "name": "webrootfinding",
+  "name": "polynomial-real-root-finding",
   "version": "1.0.0",
   "description": "Polynomial real root-finding within the browser using javascript libraries",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "LICENSE", 
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/The2Innkeeper/polynomial-real-root-finding.git"
+  },
   "directories": {
     "test": "tests"
   },
   "scripts": {
     "test": "jest",
-    "build": "webpack"
+    "build": "webpack",
+    "compile": "tsc"
   },
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node"
   },
   "keywords": [
-    "polynomial root finding"
+    "polynomial real root finding"
   ],
   "author": "",
   "license": "ISC",
