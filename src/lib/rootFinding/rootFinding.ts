@@ -6,7 +6,17 @@ import { refineRootIntervalBisection } from '../interval/bisection';
 import { evaluatePolynomial } from '../polynomial/evaluation';
 import { scaleInput } from '../polynomial/transformations';
 
-/** Performance efficient version (less function calls)
+function calculateDecimalPlacesFromPrecision(precision: number): number {
+  if (precision <= 0) return 0; // safeguard against non-positive precision
+  return -Math.floor(Math.log10(precision));
+}
+
+function roundToPrecisionBasedOnDecimal(num: number, precision: number): number {
+  const decimalPlaces = calculateDecimalPlacesFromPrecision(precision);
+  return parseFloat(num.toFixed(decimalPlaces));
+}
+
+/** Performance efficient version (less duplicate function calls by caching results)
  * Finds all real roots of a polynomial with the given precision.
  *
  * @param {Polynomial} polynomial - the polynomial to find roots for
@@ -21,36 +31,32 @@ export function findAllRealRoots(polynomial: Polynomial, precision: number = 1e-
   }
 
   const squareFreePolynomial = makeSquareFree(polynomial);
-  
-  // Deal with 0 first because it's annoying
+
   if (Math.abs(polynomial[0]) < Number.EPSILON) {
     roots.push(0);
     polynomial.splice(0, 1);
   }
 
+  const processRoots = (polynomial: Polynomial, isNegative: boolean = false) => {
+    const rootIntervals = isolatePositiveRealRootsContinuedFractions(polynomial);
+    const evaluateFunc = (x: number) => evaluatePolynomial(polynomial, x);
+
+    for (const interval of rootIntervals) {
+      const rawRoot = refineRootIntervalBisection(evaluateFunc, interval, precision);
+      const root = isNegative ? -rawRoot : rawRoot;
+      insertRootSorted(roots, roundToPrecisionBasedOnDecimal(root, precision), precision);
+    }
+  };
+
   // Find negative roots
   if (hasStrictlyNegativeRoots(squareFreePolynomial)) {
     const negatedPolynomial = scaleInput(squareFreePolynomial, -1);
-    const negativeRootIntervals = isolatePositiveRealRootsContinuedFractions(negatedPolynomial);
-    const evaluateFunc = (x: number) => evaluatePolynomial(negatedPolynomial, x);
-    // const evaluateFunc = (x: number) => evaluatePolynomial(squareFreePolynomial, -x);
-
-    for (const interval of negativeRootIntervals) {
-      const negatedRoot = refineRootIntervalBisection(evaluateFunc, interval, precision);
-      const root = -negatedRoot;
-      insertRootSorted(roots, root, precision);
-    }
+    processRoots(negatedPolynomial, true);
   }
 
   // Find positive roots
   if (hasStrictlyPositiveRoots(squareFreePolynomial)) {
-    const positiveRootIntervals = isolatePositiveRealRootsContinuedFractions(squareFreePolynomial);
-    const evaluateFunc = (x: number) => evaluatePolynomial(squareFreePolynomial, x);
-
-    for (const interval of positiveRootIntervals) {
-      const root = refineRootIntervalBisection(evaluateFunc, interval, precision);
-      insertRootSorted(roots, root, precision);
-    }
+    processRoots(squareFreePolynomial);
   }
 
   return roots;
