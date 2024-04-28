@@ -2,7 +2,7 @@
 Polynomial real root-finding within the browser using javascript
 
 # References
-```
+```BibTeX
 @article{article,
 author = {Akritas, Alkiviadis},
 year = {2009},
