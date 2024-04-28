@@ -1,5 +1,6 @@
 .ps1
 .cmd
+.npmrc
 
 # Node.js modules
 node_modules/

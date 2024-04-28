@@ -2,22 +2,26 @@
   "name": "@the2innkeeper/polynomial-real-root-finding",
   "version": "1.0.0",
   "description": "Polynomial real root-finding within the browser using javascript libraries",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/lib/index.js",
+  "types": "./dist/lib/index.d.ts",
   "files": [
     "./lib/"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/The2Innkeeper/polynomial-real-root-finding.git"
+    "url": "git+https://github.com/The2Innkeeper/polynomial-real-root-finding.git"
   },
   "directories": {
     "test": "tests"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "scripts": {
     "test": "jest",
     "build": "webpack --mode=production",
-    "compile": "tsc"
+    "compile": "tsc",
+    "prepublishOnly": "npm run compile"
   },
   "jest": {
     "preset": "ts-jest",

@@ -103,39 +103,39 @@ function insertRootSorted(roots: number[], newRoot: number, tolerance: number = 
 //   return roots;
 // }
 
-// function findStrictlyPositiveRoots(polynomial: Polynomial, precision: number): number[] {
-//   if (!hasStrictlyPositiveRoots(polynomial)) {
-//     return [];
-//   }
+export function findStrictlyPositiveRoots(polynomial: Polynomial, precision: number): number[] {
+  if (!hasStrictlyPositiveRoots(polynomial)) {
+    return [];
+  }
 
-//   const roots: number[] = [];
-//   const squareFreePolynomial = makeSquareFree(polynomial);
-//   const isolatedRootIntervals = isolatePositiveRealRootsContinuedFractions(squareFreePolynomial);
-//   const evaluateFunc = (x: number) => evaluatePolynomial(squareFreePolynomial, x);
+  const roots: number[] = [];
+  const squareFreePolynomial = makeSquareFree(polynomial);
+  const isolatedRootIntervals = isolatePositiveRealRootsContinuedFractions(squareFreePolynomial);
+  const evaluateFunc = (x: number) => evaluatePolynomial(squareFreePolynomial, x);
 
-//   for (const interval of isolatedRootIntervals) {
-//     const root = refineRootIntervalBisection(evaluateFunc, interval, precision);
-//     roots.push(root);
-//   }
+  for (const interval of isolatedRootIntervals) {
+    const root = refineRootIntervalBisection(evaluateFunc, interval, precision);
+    roots.push(root);
+  }
 
-//   return roots;
-// }
+  return roots;
+}
 
-// function findStrictlyNegativeRoots(polynomial: Polynomial, precision: number): number[] {
-//   if (!hasStrictlyNegativeRoots(polynomial)) {
-//     return [];
-//   }
+export function findStrictlyNegativeRoots(polynomial: Polynomial, precision: number): number[] {
+  if (!hasStrictlyNegativeRoots(polynomial)) {
+    return [];
+  }
 
-//   const negatedNegativeRoots: number[] = [];
-//   const squareFreePolynomial = makeSquareFree(polynomial);
-//   const negatedPolynomial = scaleInput(squareFreePolynomial, -1);
-//   const isolatedRootIntervals = isolatePositiveRealRootsContinuedFractions(negatedPolynomial);
-//   const evaluateFunc = (x: number) => evaluatePolynomial(negatedPolynomial, x);
+  const negatedNegativeRoots: number[] = [];
+  const squareFreePolynomial = makeSquareFree(polynomial);
+  const negatedPolynomial = scaleInput(squareFreePolynomial, -1);
+  const isolatedRootIntervals = isolatePositiveRealRootsContinuedFractions(negatedPolynomial);
+  const evaluateFunc = (x: number) => evaluatePolynomial(negatedPolynomial, x);
 
-//   for (const interval of isolatedRootIntervals) {
-//     const root = refineRootIntervalBisection(evaluateFunc, interval, precision);
-//     negatedNegativeRoots.push(root);
-//   }
+  for (const interval of isolatedRootIntervals) {
+    const root = refineRootIntervalBisection(evaluateFunc, interval, precision);
+    negatedNegativeRoots.push(root);
+  }
 
-//   return negatedNegativeRoots.map(root => -root).sort();
-// }
+  return negatedNegativeRoots.map(root => -root).sort();
+}
