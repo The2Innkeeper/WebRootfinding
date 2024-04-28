@@ -7,3 +7,5 @@ import { Polynomial } from '../polynomial/types';
  * @return {number[]} an array of all real roots found sorted in increasing order.
  */
 export declare function findAllRealRoots(polynomial: Polynomial, precision?: number): number[];
+export declare function findStrictlyPositiveRoots(polynomial: Polynomial, precision: number): number[];
+export declare function findStrictlyNegativeRoots(polynomial: Polynomial, precision: number): number[];
