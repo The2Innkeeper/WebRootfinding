@@ -2,6 +2,7 @@
 Polynomial real root-finding within the browser using javascript
 
 # References
+```
 @article{article,
 author = {Akritas, Alkiviadis},
 year = {2009},
@@ -36,6 +37,7 @@ url = {https://www.sciencedirect.com/science/article/pii/S0304397512009437},
 author = {Elias P. Tsigaridas}
 }
 https://www.sciencedirect.com/science/article/pii/S0304397512009437
+```
 
 https://en.wikipedia.org/wiki/Sturm%27s_theorem
 https://en.wikipedia.org/wiki/Real-root_isolation#Continued_fraction_method
