@@ -1,18 +1,15 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.isolatePositiveRealRootsContinuedFractions = exports.isolatePositiveRealRootsBisection = void 0;
-const operations_1 = require("../polynomial/operations");
-const rootBounds_1 = require("../polynomial/rootBounds");
-const transformations_1 = require("../polynomial/transformations");
-const operations_2 = require("../mobius/operations");
-const evaluation_1 = require("../polynomial/evaluation");
+import { makeSquareFree } from '../polynomial/operations';
+import { lmqPositiveUpperBound, lmqPositiveLowerBound } from '../polynomial/rootBounds';
+import { scaleInput, scaleInputInReverseOrder, taylorShiftBy1, mapIntervalToPositiveReals, mapUnitIntervalToPositiveReals, transformedForLowerInterval } from '../polynomial/transformations';
+import { createMobiusTransformation, evaluateAt, positiveDomainImage, scaleInput as mobiusScaleInput, taylorShiftBy1 as mobiusTaylorShiftBy1, transformedForLowerInterval as mobiusTransformedForLowerInterval } from '../mobius/operations';
+import { evaluatePolynomial } from '../polynomial/evaluation';
 /**
  * Isolates the positive real roots of a polynomial using the bisection method and Descartes' rule of signs.
  * @param polynomial The polynomial to find the positive real roots of.
  * @param maxIterations The maximum number of iterations to perform (default: 50).
  * @returns A list of intervals, each containing a single positive real root.
  */
-function isolatePositiveRealRootsBisection(polynomial, maxIterations = 50) {
+export function isolatePositiveRealRootsBisection(polynomial, maxIterations = 50) {
     // Validate input
     if (polynomial.length === 0) {
         throw new Error("The polynomial cannot be empty.");
@@ -27,10 +24,10 @@ function isolatePositiveRealRootsBisection(polynomial, maxIterations = 50) {
         return [];
     }
     // Process polynomial
-    const squareFreePolynomial = (0, operations_1.makeSquareFree)(polynomial);
-    const positiveUpperBound = (0, rootBounds_1.lmqPositiveUpperBound)(squareFreePolynomial);
-    const horizontallyShrunkenPolynomial = (0, transformations_1.scaleInput)(squareFreePolynomial, positiveUpperBound);
-    const initialMobius = (0, operations_2.createMobiusTransformation)(positiveUpperBound, 0, 0, 1);
+    const squareFreePolynomial = makeSquareFree(polynomial);
+    const positiveUpperBound = lmqPositiveUpperBound(squareFreePolynomial);
+    const horizontallyShrunkenPolynomial = scaleInput(squareFreePolynomial, positiveUpperBound);
+    const initialMobius = createMobiusTransformation(positiveUpperBound, 0, 0, 1);
     const initialSignVariationCount = countSignVariations(horizontallyShrunkenPolynomial);
     const tasks = [[horizontallyShrunkenPolynomial, initialMobius, initialSignVariationCount]];
     const isolatingIntervals = [];
@@ -50,16 +47,16 @@ function isolatePositiveRealRootsBisection(polynomial, maxIterations = 50) {
             default:
                 // More than one root, split the interval and add both halves to the queue
                 // Check midpoint for root
-                const originalMidpoint = (0, operations_2.evaluateAt)(currentMobius, 0.5);
+                const originalMidpoint = evaluateAt(currentMobius, 0.5);
                 let foundRootAtMidpoint = 0;
-                if ((0, evaluation_1.evaluatePolynomial)(horizontallyShrunkenPolynomial, originalMidpoint) === 0) {
+                if (evaluatePolynomial(horizontallyShrunkenPolynomial, originalMidpoint) === 0) {
                     addIntervalSort(isolatingIntervals, [originalMidpoint, originalMidpoint]);
                     foundRootAtMidpoint = 1;
                 }
                 // Left half
-                const leftHalfPolynomial = (0, transformations_1.scaleInputInReverseOrder)(currentPolynomial, 2);
+                const leftHalfPolynomial = scaleInputInReverseOrder(currentPolynomial, 2);
                 const leftHalfVariations = countSignVariationsInUnitInterval(leftHalfPolynomial);
-                const leftMobius = (0, operations_2.scaleInput)(currentMobius, 0.5);
+                const leftMobius = mobiusScaleInput(currentMobius, 0.5);
                 if (leftHalfVariations === 1) {
                     addIsolatingInterval(isolatingIntervals, leftMobius, squareFreePolynomial);
                 }
@@ -71,8 +68,8 @@ function isolatePositiveRealRootsBisection(polynomial, maxIterations = 50) {
                 if (rightHalfVariations === 0) {
                     break;
                 }
-                const rightHalfPolynomial = (0, transformations_1.taylorShiftBy1)(leftHalfPolynomial);
-                const rightMobius = (0, operations_2.taylorShiftBy1)(leftMobius);
+                const rightHalfPolynomial = taylorShiftBy1(leftHalfPolynomial);
+                const rightMobius = mobiusTaylorShiftBy1(leftMobius);
                 if (rightHalfVariations === 1) {
                     addIsolatingInterval(isolatingIntervals, rightMobius, squareFreePolynomial);
                 }
@@ -84,14 +81,13 @@ function isolatePositiveRealRootsBisection(polynomial, maxIterations = 50) {
     }
     return isolatingIntervals;
 }
-exports.isolatePositiveRealRootsBisection = isolatePositiveRealRootsBisection;
 /**
  * Isolates the positive real roots of a polynomial using the continued fractions method and Descartes' rule of signs.
  * @param polynomial The polynomial to find the positive real roots of.
  * @param maxIterations The maximum number of iterations to perform (default: 50).
  * @returns A list of intervals, each containing a single positive real root.
  */
-function isolatePositiveRealRootsContinuedFractions(inputPolynomial, maxIterations = 50) {
+export function isolatePositiveRealRootsContinuedFractions(inputPolynomial, maxIterations = 50) {
     // Validate input
     if (inputPolynomial.length === 0) {
         throw new Error("The input polynomial cannot be empty.");
@@ -101,9 +97,9 @@ function isolatePositiveRealRootsContinuedFractions(inputPolynomial, maxIteratio
     }
     // Ensure immutability
     const polynomial = [...inputPolynomial];
-    const squareFreePolynomial = (0, operations_1.makeSquareFree)(polynomial);
+    const squareFreePolynomial = makeSquareFree(polynomial);
     const initialSignVariationCount = countSignVariations(squareFreePolynomial);
-    const tasks = [[squareFreePolynomial.slice(), (0, operations_2.createMobiusTransformation)(1, 0, 0, 1), initialSignVariationCount]];
+    const tasks = [[squareFreePolynomial.slice(), createMobiusTransformation(1, 0, 0, 1), initialSignVariationCount]];
     const isolatedRootIntervals = [];
     for (let iteration = 0; iteration < maxIterations && tasks.length > 0; iteration++) {
         if (iteration === maxIterations) {
@@ -124,7 +120,7 @@ function isolatePositiveRealRootsContinuedFractions(inputPolynomial, maxIteratio
             throw new Error("The polynomial coefficients cannot contain NaN.");
         }
         // Main algorithm
-        const lowerBound = (0, rootBounds_1.lmqPositiveLowerBound)(currentPolynomial);
+        const lowerBound = lmqPositiveLowerBound(currentPolynomial);
         adjustForLowerBound(currentPolynomial, currentMobius, lowerBound);
         // Divide by x if needed (input polynomial is square-free, so only once is OK)
         checkAndHandleRootAtZero(isolatedRootIntervals, currentPolynomial, currentMobius);
@@ -140,8 +136,8 @@ function isolatePositiveRealRootsContinuedFractions(inputPolynomial, maxIteratio
         // Starting with ]1,+inf[ because it only requires a Taylor shift, compared to
         // ]0,1[ where it needs a Taylor shift + reversion
         // ]1,+inf[
-        const polynomial1ToInf = (0, transformations_1.taylorShiftBy1)(currentPolynomial);
-        const mobius1ToInf = (0, operations_2.taylorShiftBy1)(currentMobius);
+        const polynomial1ToInf = taylorShiftBy1(currentPolynomial);
+        const mobius1ToInf = mobiusTaylorShiftBy1(currentMobius);
         // [1,1]
         let foundRootAt1 = 0;
         foundRootAt1 += checkAndHandleRootAtZero(isolatedRootIntervals, polynomial1ToInf, mobius1ToInf) ? 1 : 0;
@@ -157,8 +153,8 @@ function isolatePositiveRealRootsContinuedFractions(inputPolynomial, maxIteratio
         if (variationCount0To1 === 0) {
             continue; // No roots in this interval, avoid extra computation
         }
-        const polynomial0To1 = (0, transformations_1.transformedForLowerInterval)(currentPolynomial, 1);
-        const mobius0To1 = (0, operations_2.transformedForLowerInterval)(currentMobius, 1);
+        const polynomial0To1 = transformedForLowerInterval(currentPolynomial, 1);
+        const mobius0To1 = mobiusTransformedForLowerInterval(currentMobius, 1);
         if (variationCount0To1 === 1) {
             addMobiusIntervalAdjusted(isolatedRootIntervals, mobius0To1, squareFreePolynomial);
             continue;
@@ -170,7 +166,6 @@ function isolatePositiveRealRootsContinuedFractions(inputPolynomial, maxIteratio
     }
     return isolatedRootIntervals;
 }
-exports.isolatePositiveRealRootsContinuedFractions = isolatePositiveRealRootsContinuedFractions;
 // Helper functions
 function hasStrictlyPositiveRoots(polynomial) {
     return polynomial.some(coeff => coeff < 0);
@@ -184,8 +179,8 @@ function handleZeroFunction(isolatedRootIntervals, polynomial) {
 }
 function adjustForLowerBound(polynomial, mobius, lowerBound) {
     if (lowerBound >= 1) {
-        const transformedPolynomial = (0, transformations_1.taylorShiftBy1)((0, transformations_1.scaleInput)(polynomial, lowerBound));
-        const transformedMobius = (0, operations_2.taylorShiftBy1)((0, operations_2.scaleInput)(mobius, lowerBound));
+        const transformedPolynomial = taylorShiftBy1(scaleInput(polynomial, lowerBound));
+        const transformedMobius = mobiusTaylorShiftBy1(mobiusScaleInput(mobius, lowerBound));
         polynomial.splice(0, polynomial.length, ...transformedPolynomial);
         mobius.splice(0, mobius.length, ...transformedMobius);
     }
@@ -194,24 +189,24 @@ function checkAndHandleRootAtZero(intervals, polynomial, mobius) {
     if (polynomial[0] !== 0) {
         return false;
     }
-    const root = (0, operations_2.evaluateAt)(mobius, 0);
+    const root = evaluateAt(mobius, 0);
     addIntervalSort(intervals, [root, root]);
     polynomial.shift();
     return true;
 }
 function addMobiusIntervalAdjusted(isolatedRootIntervals, mobius, initialPolynomial) {
-    const mobiusImage = (0, operations_2.positiveDomainImage)(mobius);
+    const mobiusImage = positiveDomainImage(mobius);
     if (mobiusImage[1] === Infinity) {
-        const updatedRightBound = (0, rootBounds_1.lmqPositiveUpperBound)(initialPolynomial);
+        const updatedRightBound = lmqPositiveUpperBound(initialPolynomial);
         addIntervalSort(isolatedRootIntervals, [mobiusImage[0], updatedRightBound]);
         return;
     }
     addIntervalSort(isolatedRootIntervals, mobiusImage);
 }
 function addIsolatingInterval(isolatedRootIntervals, mobius, initialPolynomial) {
-    const mobiusImage = (0, operations_2.positiveDomainImage)(mobius);
+    const mobiusImage = positiveDomainImage(mobius);
     if (mobiusImage[1] === Infinity) {
-        const updatedRightBound = (0, rootBounds_1.lmqPositiveUpperBound)(initialPolynomial);
+        const updatedRightBound = lmqPositiveUpperBound(initialPolynomial);
         addIntervalSort(isolatedRootIntervals, [mobiusImage[0], updatedRightBound]);
         return;
     }
@@ -269,9 +264,9 @@ function countSignVariations(polynomial) {
     return signVariations;
 }
 function countSignVariationsInUnitInterval(polynomial) {
-    return countSignVariations((0, transformations_1.mapUnitIntervalToPositiveReals)(polynomial));
+    return countSignVariations(mapUnitIntervalToPositiveReals(polynomial));
 }
 function countSignVariationsInInterval(polynomial, interval) {
-    return countSignVariations((0, transformations_1.mapIntervalToPositiveReals)(polynomial, interval));
+    return countSignVariations(mapIntervalToPositiveReals(polynomial, interval));
 }
 //# sourceMappingURL=realRootIsolation.js.map

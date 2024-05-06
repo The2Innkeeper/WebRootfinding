@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.lmqPositiveLowerBound = exports.lmqPositiveUpperBound = void 0;
 /**
  * Calculates the Local-Max-Quadratic (LMQ) bound for the positive roots of a polynomial.
  * This method provides an upper bound estimate based on the polynomial's coefficients.
@@ -8,7 +5,7 @@ exports.lmqPositiveLowerBound = exports.lmqPositiveUpperBound = void 0;
  * @returns The LMQ bound as a number, representing an upper bound on the polynomial's positive roots.
  * @throws {Error} Thrown when the polynomial is null or empty.
  */
-function lmqPositiveUpperBound(polynomial) {
+export function lmqPositiveUpperBound(polynomial) {
     // First, the polynomial must have a positive leading coefficient.
     const coefficientCount = polynomial.length;
     let coefficients;
@@ -57,7 +54,6 @@ function lmqPositiveUpperBound(polynomial) {
     }
     return upperBound < 0 ? NaN : upperBound;
 }
-exports.lmqPositiveUpperBound = lmqPositiveUpperBound;
 /**
  * Calculates the Local-Max-Quadratic (LMQ) lower bound for the positive roots of a polynomial
  * by transforming the polynomial P(x) -> x^n*P(1/x) and then computing the upper bound of the transformed polynomial.
@@ -65,7 +61,7 @@ exports.lmqPositiveUpperBound = lmqPositiveUpperBound;
  * @returns The LMQ lower bound as a number, representing a lower bound on the polynomial's positive roots.
  * @throws {Error} Thrown when the polynomial is null or empty.
  */
-function lmqPositiveLowerBound(polynomial) {
+export function lmqPositiveLowerBound(polynomial) {
     const coefficientCount = polynomial.length;
     let coefficients;
     if (polynomial[0] < 0) {
@@ -111,5 +107,4 @@ function lmqPositiveLowerBound(polynomial) {
     const lowerBound = 1.0 / maxMinRadical;
     return lowerBound < 0 ? NaN : lowerBound;
 }
-exports.lmqPositiveLowerBound = lmqPositiveLowerBound;
 //# sourceMappingURL=rootBounds.js.map

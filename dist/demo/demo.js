@@ -1,6 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const rootFinding_1 = require("../lib/rootFinding/rootFinding");
+import { findAllRealRoots } from '../lib/rootFinding/rootFinding';
 // HTML elements
 const coefficientsInput = document.getElementById('coefficients');
 const findRootsButton = document.getElementById('findRoots');
@@ -39,7 +37,7 @@ function runDemo() {
     const polynomial = parsePolynomial(input);
     console.log('Parsed polynomial coefficients:', polynomial);
     const precision = Number(precisionInput.value) ? Number(precisionInput.value) : 1e-5;
-    const roots = (0, rootFinding_1.findAllRealRoots)(polynomial, precision);
+    const roots = findAllRealRoots(polynomial, precision);
     console.log('Roots:', roots);
     resultDiv.textContent = `Real roots: ${roots.length > 0 ? roots.join(', ') : 'none'}`;
     console.log('Result displayed');

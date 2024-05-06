@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.refineRootIntervalBisectionBounds = exports.refineRootIntervalBisection = void 0;
 /**
  * Finds a root of the function within the specified Interval using the bisection method.
  * @param func The function whose roots we are trying to refine.
@@ -12,10 +9,9 @@ exports.refineRootIntervalBisectionBounds = exports.refineRootIntervalBisection 
  * or NaN if the root cannot be found within the given number of iterations.
  * @throws {Error} Thrown if the initial interval does not contain a root.
  */
-function refineRootIntervalBisection(func, interval, tolerance = 1e-5, maxIterations = 250) {
+export function refineRootIntervalBisection(func, interval, tolerance = 1e-5, maxIterations = 250) {
     return refineRootIntervalBisectionBounds(func, interval[0], interval[1], tolerance, maxIterations);
 }
-exports.refineRootIntervalBisection = refineRootIntervalBisection;
 /**
  * Finds a root of the function within the specified OPEN interval using the bisection method.
  * @param func The function whose roots we are trying to refine.
@@ -26,7 +22,7 @@ exports.refineRootIntervalBisection = refineRootIntervalBisection;
  * @returns The approximate position of the root within the specified interval, determined to be within the specified tolerance, or NaN if the root cannot be found within the given number of iterations.
  * @throws {Error} Thrown if the initial interval does not contain a root.
  */
-function refineRootIntervalBisectionBounds(func, leftBound, rightBound, tolerance = 1e-5, maxIterations = 100) {
+export function refineRootIntervalBisectionBounds(func, leftBound, rightBound, tolerance = 1e-5, maxIterations = 100) {
     let fLeft = func(leftBound);
     // Initial interval is root
     if (leftBound === rightBound) {
@@ -68,5 +64,4 @@ function refineRootIntervalBisectionBounds(func, leftBound, rightBound, toleranc
     // If the maximum number of iterations is reached without converging
     return NaN;
 }
-exports.refineRootIntervalBisectionBounds = refineRootIntervalBisectionBounds;
 //# sourceMappingURL=bisection.js.map
