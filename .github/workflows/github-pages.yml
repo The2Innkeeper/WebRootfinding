@@ -12,8 +12,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "14.x"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@the2innkeeper"
+
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PKG_TOKEN }}
 
       - name: Build project
         run: npm run build
@@ -23,4 +32,4 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: gh-pages
-          folder: build  # The folder that you want to deploy. This should match the output directory of your build script
+          folder: build # The folder that you want to deploy. This should match the output directory of your build script
