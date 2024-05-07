@@ -1,6 +1,6 @@
 {
-  "name": "@the2innkeeper/polynomial-real-root-finding",
-  "version": "1.0.4",
+  "name": "polynomial-real-root-finding",
+  "version": "1.0.1",
   "description": "Polynomial real root-finding within the browser using javascript libraries",
   "main": "./dist/lib/index.js",
   "types": "./dist/lib/index.d.ts",
@@ -15,7 +15,7 @@
     "test": "tests"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
+    "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
     "test": "jest",
